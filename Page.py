@@ -33,7 +33,7 @@ class Page:
     # draws the boxes within the frame
     def draw(self):
         text_font = font.Font(size=20)
-        text = tk.Label(self.frame, font=text_font, justify=tk.LEFT, bg='SystemButtonFace',
+        text = tk.Label(self.frame, font=text_font, justify=tk.LEFT, bg='#ebeced',
                         text="Click a button along the top to select a mode.\n\n" \
                              "Drag your finger between the buttons to see more modes.\n\n" \
                              "Press the power button or \"Off\" mode to return here and turn off the LEDs.\n\n" \

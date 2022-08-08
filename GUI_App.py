@@ -14,7 +14,9 @@ from Page import Page
 from SolidColor import SolidColor
 from Rainbow import Rainbow
 from StockTicker import StockTicker
-from PIL import Image, ImageTk
+import PIL
+from PIL import Image
+from PIL import ImageTk
 
 # list of all possible pages
 PAGES = {
@@ -29,7 +31,7 @@ class GUI:
         # initialize root
         self.root = tk.Tk()
         # maximize window and get width and height
-        self.root.state('zoomed')
+        # self.root.state('zoomed')
         self.width = self.root.winfo_screenwidth()
         self.height = self.root.winfo_screenheight()
         self.root.config(background="#666d70")
