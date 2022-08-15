@@ -1,7 +1,7 @@
 """
 author: Matt Ippolito
 date-created: 5/21/22
-date-last-modified: 5/21/22
+date-last-modified: 8/7/22
 
 Page.py
 This file contains the default page class.  The first page that is automatically
@@ -11,6 +11,7 @@ is LEDs off.
 
 import tkinter as tk
 import tkinter.font as font
+from SPIManager import send_data
 
 class Page:
     def __init__(self, root):
@@ -20,18 +21,18 @@ class Page:
         self.frame = tk.Frame(root, width=self.width, height=self.height)
         self.frame.configure(background="#a7b1b5")
         self.frame.place(x=0, y=0.22*root.winfo_screenheight())
-        self.data = {}
 
     # returns the settings data, first byte is Page id
     def get_settings_data(self):
-        return chr(0)
+        return [0x00], 1
     
-    # returns the serial data, or None if there is none
-    def get_serial_data(self):
-        return None
+    # Sends the settings data
+    def send_settings_data(self):
+        send_data(self.get_settings_data())
     
     # draws the boxes within the frame
     def draw(self):
+        # Draw
         text_font = font.Font(size=20)
         text = tk.Label(self.frame, font=text_font, justify=tk.LEFT, bg='#ebeced',
                         text="Click a button along the top to select a mode.\n\n" \

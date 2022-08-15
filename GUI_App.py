@@ -1,7 +1,7 @@
 """
 author: Matt Ippolito
 date-created: 5/21/22
-date-last-modified: 5/21/22
+date-last-modified: 8/7/22
 
 GUI_App.py
 This file contains the actual GUI code.  It manages which page is showing and loads
@@ -17,6 +17,8 @@ from StockTicker import StockTicker
 import PIL
 from PIL import Image
 from PIL import ImageTk
+
+from SPIManager import init_SPI_pins, send_data
 
 # list of all possible pages
 PAGES = {
