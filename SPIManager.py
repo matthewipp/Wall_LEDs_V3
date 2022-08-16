@@ -25,13 +25,6 @@ def open_serial_port(attempts):
             print("Serial Port Not Available.")
             time.sleep(0.5)    
     return False
-        
-# Init pins and set to starting value
-def init_SPI_pins():
-    opened = False
-    while not opened:
-        opened = open_serial_port(1)
-    return
 
 # send data to raspberry pi
 def send_data(data):
