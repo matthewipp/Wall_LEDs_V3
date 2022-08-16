@@ -25,10 +25,9 @@ DMAMEM int displayMemory[NUM_LEDS*BYTES_PER_LED/BYTES_PER_INT];
 int drawingMemory[NUM_LEDS*BYTES_PER_LED/BYTES_PER_INT];
 OctoWS2811 leds(LED_LENGTH, displayMemory, drawingMemory, LED_COLOR_ORDER | LED_SPEED, NUM_LED_STRIPS, ledPins);
 LEDMode* ledMode;
-bool spiActive;
-byte spiMessageLength;
-byte spiBitCounter;
-byte spiByteCounter;
+bool readingSerial;
+int serialCounter;
+byte serialBuffer[256];
 byte spiMessage[256];
 byte freqBuffers[7][FREQ_BUFFER_LEN];
 int freqSums[7];
@@ -47,10 +46,7 @@ void setup() {
   // Disable interrupts until after setup
   noInterrupts();
   // Init debug if debugging
-  #ifdef DEBUG
-    Serial.begin(115200);
-    Serial.println("Serial Debug Initialized");
-  #endif
+  Serial.begin(115200);
   // Pin Initializations
   pinMode(LED_0_PIN, OUTPUT);
   pinMode(LED_1_PIN, OUTPUT);
@@ -61,12 +57,8 @@ void setup() {
   pinMode(LED_6_PIN, OUTPUT);
   pinMode(LED_7_PIN, OUTPUT);
   // SPI Initialization
-  spiActive = false;
-  pinMode(RPI_CS, INPUT);
-  pinMode(RPI_COPI, INPUT);
-  pinMode(RPI_CIPO, OUTPUT);
-  pinMode(RPI_SCK, INPUT);
-  //attachInterrupt(digitalPinToInterrupt(RPI_CS), &spiCSInterruptHandler, FALLING);
+  readingSerial = false;
+  serialCounter = 0;
   spiMessage[0] = 0x03;
   spiMessage[1] = 0x60;
   spiMessage[2] = 0x1A;
@@ -97,46 +89,56 @@ void setup() {
 }
 
 void loop() {
-  // Check SPI
-  if(spiActive) {
-    // Wait for and read SPI
-    if(digitalReadFast(RPI_CS)) {
-      spiActive = false;
-      detachInterrupt(digitalPinToInterrupt(RPI_SCK));
+  // Check Serial, if available reads one byte every loop until finished, then copies everything over
+  if(readingSerial) {
+    if(Serial.available() == 0) {
+      readingSerial = false;
+      for(int i = 0; i < serialCounter; i++) {
+        spiMessage[i] = serialBuffer[i];
+      }
+    }
+    else {
+      // Read one byte then continue loop
+      serialBuffer[serialCounter] = Serial.read();
+      serialCounter++;
     }
   }
   else {
-    // Check if mode has changed
-    if(spiMessage[0] != ledMode->modeID) {
-      delete ledMode;
-      switch(spiMessage[0]) {
-        case 0:
-          ledMode = new LEDMode(LED_LENGTH, NUM_LED_STRIPS);
-          break;
-        case 1:
-          ledMode = new SolidColorMode(LED_LENGTH, NUM_LED_STRIPS);
-          break;
-        case 2:
-          ledMode = new EqualizerMode(LED_LENGTH, NUM_LED_STRIPS);
-          break;
-        case 3:
-          ledMode = new EqualizerTextMode(LED_LENGTH, NUM_LED_STRIPS);
-          break;
-        case 255:
-          ledMode = new TestMode(LED_LENGTH, NUM_LED_STRIPS);
-          break;
-        default:
-          ledMode = new LEDMode(LED_LENGTH, NUM_LED_STRIPS);
-      }
+    if(Serial.available() > 0) {
+      readingSerial = true;
+      serialCounter = 0;
     }
-    // Run normal loop
-    thisUpdateCall = millis();
-    readMSGEQ7();
-    ledMode->updateLEDs(leds, freqMags, spiMessage, thisUpdateCall-lastUpdateCall);
-    lastUpdateCall = thisUpdateCall;
-    leds.show();
-    while(millis() - thisUpdateCall < 20);
   }
+  // Check if mode has changed
+  if(spiMessage[0] != ledMode->modeID) {
+    delete ledMode;
+    switch(spiMessage[0]) {
+      case 0:
+        ledMode = new LEDMode(LED_LENGTH, NUM_LED_STRIPS);
+        break;
+      case 1:
+        ledMode = new SolidColorMode(LED_LENGTH, NUM_LED_STRIPS);
+        break;
+      case 2:
+        ledMode = new EqualizerMode(LED_LENGTH, NUM_LED_STRIPS);
+        break;
+      case 3:
+        ledMode = new EqualizerTextMode(LED_LENGTH, NUM_LED_STRIPS);
+        break;
+      case 255:
+        ledMode = new TestMode(LED_LENGTH, NUM_LED_STRIPS);
+        break;
+      default:
+        ledMode = new LEDMode(LED_LENGTH, NUM_LED_STRIPS);
+    }
+  }
+  // Run normal loop
+  thisUpdateCall = millis();
+  readMSGEQ7();
+  ledMode->updateLEDs(leds, freqMags, spiMessage, thisUpdateCall-lastUpdateCall);
+  lastUpdateCall = thisUpdateCall;
+  leds.show();
+  while(millis() - thisUpdateCall < 20);
 }
 
 // Read data from MSGEQ7
@@ -162,29 +164,5 @@ void readMSGEQ7() {
   freqSumsCounter++;
   if(freqSumsCounter >= FREQ_BUFFER_LEN) {
     freqSumsCounter = 0;
-  }
-}
-
-void spiCSInterruptHandler() {
-  spiActive = true;
-  spiBitCounter = 0;
-  spiByteCounter = 0;
-  attachInterrupt(digitalPinToInterrupt(RPI_CS), &spiSCKInterruptHandler, RISING);
-}
-
-void spiSCKInterruptHandler() {
-  spiBitCounter++;
-  spiMessage[spiByteCounter] = (spiMessage[spiByteCounter] << 1) | digitalReadFast(RPI_COPI);
-  if(spiBitCounter == 8) {
-    spiBitCounter = 0;
-    if(spiByteCounter == 0) {
-      spiMessageLength = spiMessage[0];
-    }
-    else {
-      spiByteCounter++;
-      if(spiByteCounter == spiMessageLength) {
-        detachInterrupt(digitalPinToInterrupt(RPI_SCK));
-      }
-    }
   }
 }

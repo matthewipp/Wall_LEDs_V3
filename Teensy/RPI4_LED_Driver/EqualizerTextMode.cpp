@@ -49,7 +49,7 @@ void EqualizerTextMode::updateLEDs(OctoWS2811& leds, byte* freqs, byte* inputBuf
   }
   // Draw Text
   int next = writeString(leds, &(inputBuffer[3]), inputBuffer[2], sectionLength, sectionLength*2, getRGB(150, 255, inputBuffer[1]), textOffset);
-  if(next >= sectionLength*2 | (resetWait && nextMove != 0)) {
+  if((next >= sectionLength*2) | (resetWait && nextMove != 0)) {
     if(resetWait && millis() > nextMove) {
       textOffset = 0;
       nextMove = millis() + 2000;

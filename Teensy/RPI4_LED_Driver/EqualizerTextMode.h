@@ -27,7 +27,7 @@ class EqualizerTextMode : public LEDMode {
     byte calcAmplitude(byte freqMag);
     byte* dotHeight;
     int textOffset;
-    long nextMove;
+    unsigned long nextMove;
     bool resetWait;
 };
 
