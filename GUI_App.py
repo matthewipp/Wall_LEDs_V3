@@ -14,11 +14,12 @@ from Page import Page
 from SolidColor import SolidColor
 from Rainbow import Rainbow
 from StockTicker import StockTicker
+from Force import Force
 import PIL
 from PIL import Image
 from PIL import ImageTk
 
-from SPIManager import init_SPI_pins, send_data
+from SPIManager import send_data, open_serial_port
 
 # list of all possible pages
 PAGES = {
@@ -26,6 +27,7 @@ PAGES = {
     "Solid" : SolidColor,
     "Rainbow" : Rainbow,
     "Stonks" : StockTicker,
+    "Force" : Force,
 }
 
 class GUI:
@@ -66,6 +68,7 @@ class GUI:
             self.page.destroy()
             self.page = new_class(self.root)
             self.page.draw()
+            self.page.send_settings_data()
     
     def start_scroll(self, event):
         for i, widget in enumerate(self.scroll_buttons):

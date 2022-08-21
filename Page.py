@@ -24,10 +24,10 @@ class Page:
 
     # returns the settings data, first byte is Page id
     def get_settings_data(self):
-        return [0x00], 1
+        return [0x00]
     
     # Sends the settings data
-    def send_settings_data(self):
+    def send_settings_data(self, var=None, index=None, mode=None):
         send_data(self.get_settings_data())
     
     # draws the boxes within the frame
@@ -41,6 +41,12 @@ class Page:
                              "Most modes have settings that can be changed in the area where this text is now.")
         text.place(x=int(0.1*self.height), y=int(0.05*self.width))
         return
+    
+    # Creates a submit button to enter all data
+    def create_submit_button(self, root, x, y):
+        button = tk.Button(root, text="Submit", font="Arial 40", command=self.send_settings_data)
+        button.place(x=x, y=y)
+        return button
     
     # destroys everything.  As long as all widgets inherit from frame this method
     # does not have to be overridden

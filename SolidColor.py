@@ -60,40 +60,43 @@ class SolidColor(Page):
         self.hue_entry_text = tk.Label(self.frame, text="Hue", font="Arial 40", bg="#ebeced")
         self.hue_entry_text.place(x=20, y=150)
         self.hue_entry = tk.Entry(self.frame, font="Arial 40", width=3, bg="#ebeced", 
-                                  textvariable=self.hue_input, command=self.send_settings_data)
+                                  textvariable=self.hue_input)
+        self.hue_input.trace_add('write', self.send_settings_data)
         self.hue_entry.place(x=130, y=150)
         # Saturation
         self.sat_entry_text = tk.Label(self.frame, text="Sat", font="Arial 40", bg="#ebeced")
         self.sat_entry_text.place(x=20, y=225)
         self.sat_entry = tk.Entry(self.frame, font="Arial 40", width=3, bg="#ebeced", 
-                                  textvariable=self.sat_input, command=self.send_settings_data)
+                                  textvariable=self.sat_input)
+        self.sat_input.trace_add('write', self.send_settings_data)
         self.sat_entry.place(x=130, y=225)
         # Value
         self.val_entry_text = tk.Label(self.frame, text="Val", font="Arial 40", bg="#ebeced")
         self.val_entry_text.place(x=20, y=300)
         self.val_entry = tk.Entry(self.frame, font="Arial 40", width=3, bg="#ebeced", 
-                                  textvariable=self.val_input, command=self.send_settings_data)
+                                  textvariable=self.val_input)
+        self.val_input.trace_add('write', self.send_settings_data)
         self.val_entry.place(x=130, y=300)
         # Hue
         self.r_entry_text = tk.Label(self.frame, text="R", font="Arial 40", bg="#ebeced")
         self.r_entry_text.place(x=300, y=150)
         self.r_entry = tk.Entry(self.frame, font="Arial 40", width=3, bg="#ebeced", 
-                                textvariable=self.r_input, state="disabled", 
-                                command=self.send_settings_data)
+                                textvariable=self.r_input, state="disabled")
+        self.r_input.trace_add('write', self.send_settings_data)
         self.r_entry.place(x=410, y=150)
         # Saturation
         self.g_entry_text = tk.Label(self.frame, text="G", font="Arial 40", bg="#ebeced")
         self.g_entry_text.place(x=300, y=225)
         self.g_entry = tk.Entry(self.frame, font="Arial 40", width=3, bg="#ebeced", 
-                                textvariable=self.g_input, state="disabled",
-                                command=self.send_settings_data)
+                                textvariable=self.g_input, state="disabled")
+        self.g_input.trace_add('write', self.send_settings_data)
         self.g_entry.place(x=410, y=225)
         # Value
         self.b_entry_text = tk.Label(self.frame, text="B", font="Arial 40", bg="#ebeced")
         self.b_entry_text.place(x=300, y=300)
         self.b_entry = tk.Entry(self.frame, font="Arial 40", width=3, bg="#ebeced", 
-                                textvariable=self.b_input, state="disabled",
-                                command=self.send_settings_data)
+                                textvariable=self.b_input, state="disabled")
+        self.b_input.trace_add('write', self.send_settings_data)
         self.b_entry.place(x=410, y=300)
         return
     
@@ -102,14 +105,14 @@ class SolidColor(Page):
         try:
             if self.use_HSV_container.get():
                 data_to_send[1] = 0x01
-                data_to_send[2] = int(self.hue_entry)
-                data_to_send[3] = int(self.sat_entry)
-                data_to_send[4] = int(self.val_entry)
+                data_to_send[2] = int(self.hue_entry.get())
+                data_to_send[3] = int(self.sat_entry.get())
+                data_to_send[4] = int(self.val_entry.get())
             else:
-                data_to_send[2] = int(self.r_entry)
-                data_to_send[3] = int(self.g_entry)
-                data_to_send[4] = int(self.b_entry)
+                data_to_send[2] = int(self.g_entry.get())
+                data_to_send[3] = int(self.r_entry.get())
+                data_to_send[4] = int(self.b_entry.get())
         except ValueError:
             pass
-        return data_to_send, 5
+        return data_to_send
 
