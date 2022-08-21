@@ -48,8 +48,11 @@ class Page:
         button.place(x=x, y=y)
         return button
     
-    # destroys everything.  As long as all widgets inherit from frame this method
-    # does not have to be overridden
+    # destroys everything
     def destroy(self):
         self.frame.destroy()
+        return
+    
+    # Destroys things specific to a mode
+    def destroy_mode(self):
         return

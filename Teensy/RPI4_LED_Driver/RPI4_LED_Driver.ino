@@ -43,10 +43,13 @@ void spiSCKInterruptHandler();
 
 // Initialize everything
 void setup() {
-  // Disable interrupts until after setup
-  noInterrupts();
+  // Startup pulse
+  pinMode(13, OUTPUT);
+  digitalWrite(13, HIGH);
+  delay(500);
+  digitalWrite(13, LOW);
   // Init debug if debugging
-  Serial.begin(115200);
+  Serial.begin(9600);
   // Pin Initializations
   pinMode(LED_0_PIN, OUTPUT);
   pinMode(LED_1_PIN, OUTPUT);
@@ -84,8 +87,6 @@ void setup() {
     }
   }
   lastUpdateCall = millis();
-  // Reenable interrupts
-  interrupts();
 }
 
 void loop() {

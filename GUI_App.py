@@ -15,6 +15,7 @@ from SolidColor import SolidColor
 from Rainbow import Rainbow
 from StockTicker import StockTicker
 from Force import Force
+from SpotifySync import SpotifySync
 import PIL
 from PIL import Image
 from PIL import ImageTk
@@ -25,6 +26,7 @@ from SPIManager import send_data, open_serial_port
 PAGES = {
     "Off" : Page,
     "Solid" : SolidColor,
+    "Spotify" : SpotifySync,
     "Rainbow" : Rainbow,
     "Stonks" : StockTicker,
     "Force" : Force,
